@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Satellite Tracker - Real-time Earth View</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #e0e7ff;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .ui-overlay * {
+            pointer-events: auto;
+        }
+
+        header {
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #a5b4fc;
+            font-size: 1em;
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            width: 320px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .control-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .control-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            color: #818cf8;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            color: #a5b4fc;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        input,
+        select {
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e7ff;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .satellite-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .satellite-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .satellite-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .satellite-item.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .sat-name {
+            font-weight: 600;
+            color: #e0e7ff;
+            margin-bottom: 4px;
+        }
+
+        .sat-id {
+            font-size: 0.8em;
+            color: #a5b4fc;
+        }
+
+        .sat-info {
+            font-size: 0.75em;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .info-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 15px 20px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            max-width: 350px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #a5b4fc;
+            font-size: 0.85em;
+        }
+
+        .info-value {
+            color: #e0e7ff;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #818cf8;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .popular-sats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .sat-chip {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 6px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .sat-chip:hover {
+            background: rgba(139, 92, 246, 0.4);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <div class="ui-overlay">
+        <header>
+            <h1>🌍 3D Satellite Tracker</h1>
+            <p class="subtitle">Real-time Earth view with orbital positions</p>
+        </header>
+
+        <div class="control-panel">
+            <div class="section">
+                <h3>Quick Access</h3>
+                <div class="popular-sats">
+                    <div class="sat-chip" onclick="trackSatellite(25544, 'ISS')">ISS</div>
+                    <div class="sat-chip" onclick="trackSatellite(33591, 'NOAA 19')">NOAA 19</div>
+                    <div class="sat-chip" onclick="trackSatellite(25994, 'TERRA')">TERRA</div>
+                    <div class="sat-chip" onclick="trackSatellite(28654, 'NOAA 18')">NOAA 18</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Add Satellite</h3>
+                <div class="input-group">
+                    <div>
+                        <label>Satellite ID (NORAD)</label>
+                        <input type="number" id="satId" placeholder="25544" value="25544">
+                    </div>
+                    <button onclick="addSatellite()">Track Satellite</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Observer Location</h3>
+                <div class="input-group">
+                    <div>
+                        <label>Latitude</label>
+                        <input type="number" step="0.0001" id="lat" placeholder="40.7128" value="40.7128">
+                    </div>
+                    <div>
+                        <label>Longitude</label>
+                        <input type="number" step="0.0001" id="lng" placeholder="-74.0060" value="-74.0060">
+                    </div>
+                    <button onclick="updateObserver()">Update Location</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Tracked Satellites</h3>
+                <div id="satellite-list" class="satellite-list">
+                    <div class="loading">Loading satellites...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel" id="info-panel" style="display: none;">
+            <h3 style="color: #818cf8; margin-bottom: 10px; font-size: 1em;">Selected Satellite</h3>
+            <div id="sat-details"></div>
+        </div>
+    </div>
+
+    <script>
+        // Three.js scene setup
+        let scene, camera, renderer, earth, stars, satellites = {};
+        let observerMarker = null;
+        let selectedSatellite = null;
+
+        const API_BASE = window.location.origin;
+        const EARTH_RADIUS = 5;
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 3, 5);
+            scene.add(directionalLight);
+
+            // Create Earth
+            createEarth();
+
+            // Create starfield
+            createStars();
+
+            // Create observer marker
+            createObserverMarker();
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Mouse controls
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+
+            renderer.domElement.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            renderer.domElement.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+
+                    earth.rotation.y += deltaX * 0.005;
+                    earth.rotation.x += deltaY * 0.005;
+
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                }
+            });
+
+            renderer.domElement.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            // Zoom with mouse wheel
+            renderer.domElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                camera.position.z += e.deltaY * 0.01;
+                camera.position.z = Math.max(8, Math.min(30, camera.position.z));
+            });
+
+            // Start animation
+            animate();
+
+            // Load initial satellite
+            trackSatellite(25544, 'ISS');
+        }
+
+        function createEarth() {
+            const geometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
+
+            // Earth texture with gradient
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            // Create gradient for ocean
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#1e3a8a');
+            gradient.addColorStop(0.5, '#2563eb');
+            gradient.addColorStop(1, '#1e3a8a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add continents (simplified)
+            ctx.fillStyle = '#15803d';
+            // North America
+            ctx.fillRect(200, 200, 400, 300);
+            // South America
+            ctx.fillRect(400, 500, 200, 300);
+            // Europe/Africa
+            ctx.fillRect(900, 200, 300, 400);
+            // Asia
+            ctx.fillRect(1200, 150, 500, 400);
+            // Australia
+            ctx.fillRect(1500, 600, 200, 150);
+
+            const texture = new THREE.CanvasTexture(canvas);
+
+            const material = new THREE.MeshPhongMaterial({
+                map: texture,
+                shininess: 20,
+                specular: 0x333333
+            });
+
+            earth = new THREE.Mesh(geometry, material);
+            scene.add(earth);
+
+            // Add atmosphere glow
+            const atmosphereGeometry = new THREE.SphereGeometry(EARTH_RADIUS * 1.1, 64, 64);
+            const atmosphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0x4a90e2,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.BackSide
+            });
+            const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+            earth.add(atmosphere);
+        }
+
+        function createStars() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.1,
+                transparent: true
+            });
+
+            const starsVertices = [];
+            for (let i = 0; i < 10000; i++) {
+                const x = (Math.random() - 0.5) * 200;
+                const y = (Math.random() - 0.5) * 200;
+                const z = (Math.random() - 0.5) * 200;
+                starsVertices.push(x, y, z);
+            }
+
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+        }
+
+        function createObserverMarker() {
+            const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            observerMarker = new THREE.Mesh(geometry, material);
+            earth.add(observerMarker);
+            updateObserverPosition();
+        }
+
+        function updateObserverPosition() {
+            const lat = parseFloat(document.getElementById('lat').value) || 0;
+            const lng = parseFloat(document.getElementById('lng').value) || 0;
+
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lng + 180) * (Math.PI / 180);
+
+            const x = -(EARTH_RADIUS * Math.sin(phi) * Math.cos(theta));
+            const y = EARTH_RADIUS * Math.cos(phi);
+            const z = EARTH_RADIUS * Math.sin(phi) * Math.sin(theta);
+
+            observerMarker.position.set(x, y, z);
+        }
+
+        function latLngToVector3(lat, lng, altitude = 0) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lng + 180) * (Math.PI / 180);
+            const radius = EARTH_RADIUS + (altitude / 6371) * EARTH_RADIUS; // Scale altitude
+
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
+
+            return new THREE.Vector3(x, y, z);
+        }
+
+        async function trackSatellite(id, name) {
+            try {
+                const response = await fetch(`${API_BASE}/positions/${id}?lat=0&lng=0&alt=0&sec=1`);
+                if (!response.ok) throw new Error('Failed to fetch satellite');
+                const data = await response.json();
+
+                addSatelliteToScene(id, data.info.satname || name, data.positions[0]);
+                updateSatelliteList();
+            } catch (error) {
+                console.error('Error tracking satellite:', error);
+            }
+        }
+
+        function addSatelliteToScene(id, name, position) {
+            // Remove existing if present
+            if (satellites[id]) {
+                earth.remove(satellites[id].mesh);
+                if (satellites[id].label) earth.remove(satellites[id].label);
+            }
+
+            // Create satellite mesh
+            const geometry = new THREE.SphereGeometry(0.15, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const satellite = new THREE.Mesh(geometry, material);
+
+            const satPosition = latLngToVector3(position.satlatitude, position.satlongitude, position.sataltitude);
+            satellite.position.copy(satPosition);
+
+            earth.add(satellite);
+
+            // Store satellite data
+            satellites[id] = {
+                mesh: satellite,
+                name: name,
+                position: position,
+                id: id
+            };
+        }
+
+        async function addSatellite() {
+            const satId = document.getElementById('satId').value;
+            if (!satId) return;
+            await trackSatellite(parseInt(satId), `Satellite ${satId}`);
+        }
+
+        function updateObserver() {
+            updateObserverPosition();
+        }
+
+        function updateSatelliteList() {
+            const listEl = document.getElementById('satellite-list');
+            if (Object.keys(satellites).length === 0) {
+                listEl.innerHTML = '<div class="loading">No satellites tracked</div>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+            Object.values(satellites).forEach(sat => {
+                const item = document.createElement('div');
+                item.className = 'satellite-item';
+                item.onclick = () => selectSatellite(sat.id);
+                item.innerHTML = `
+                    <div class="sat-name">${sat.name}</div>
+                    <div class="sat-id">ID: ${sat.id}</div>
+                    <div class="sat-info">Alt: ${sat.position.sataltitude.toFixed(0)} km</div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        function selectSatellite(id) {
+            selectedSatellite = satellites[id];
+            const panel = document.getElementById('info-panel');
+            const details = document.getElementById('sat-details');
+
+            if (selectedSatellite) {
+                panel.style.display = 'block';
+                details.innerHTML = `
+                    <div class="info-item">
+                        <span class="info-label">Name</span>
+                        <span class="info-value">${selectedSatellite.name}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">ID</span>
+                        <span class="info-value">${selectedSatellite.id}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Latitude</span>
+                        <span class="info-value">${selectedSatellite.position.satlatitude.toFixed(4)}°</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Longitude</span>
+                        <span class="info-value">${selectedSatellite.position.satlongitude.toFixed(4)}°</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Altitude</span>
+                        <span class="info-value">${selectedSatellite.position.sataltitude.toFixed(2)} km</span>
+                    </div>
+                `;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Auto-rotate Earth slowly
+            earth.rotation.y += 0.001;
+
+            // Rotate stars slowly
+            if (stars) stars.rotation.y += 0.0002;
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Start the application
+        init();
+
+        // Auto-refresh satellite positions every 10 seconds
+        setInterval(() => {
+            Object.keys(satellites).forEach(id => {
+                trackSatellite(parseInt(id), satellites[id].name);
+            });
+        }, 10000);
+    </script>
+</body>
+
+</html>

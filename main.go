@@ -52,56 +52,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
-	w.Header().Set("Content-Type", "text/html")
-	html := `<!DOCTYPE html>
-<html>
-<head>
-    <title>N2YO Satellite API</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 900px; margin: 50px auto; padding: 20px; }
-        h1 { color: #333; }
-        .endpoint { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        code { background: #e0e0e0; padding: 2px 6px; border-radius: 3px; }
-        .method { color: #2196F3; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <h1>N2YO Satellite API</h1>
-    <p>Available endpoints:</p>
-    
-    <div class="endpoint">
-        <p><span class="method">GET</span> <code>/tle/{satelliteId}</code></p>
-        <p>Get Two-Line Element Set (TLE) for a satellite</p>
-        <p>Example: <a href="/tle/25544">/tle/25544</a> (ISS)</p>
-    </div>
-    
-    <div class="endpoint">
-        <p><span class="method">GET</span> <code>/positions/{satelliteId}?lat={observer_lat}&lng={observer_lng}&alt={observer_alt}&sec={seconds}</code></p>
-        <p>Get future positions of a satellite</p>
-        <p>Example: <a href="/positions/25544?lat=40.7128&lng=-74.0060&alt=0&sec=2">/positions/25544?lat=40.7128&lng=-74.0060&alt=0&sec=2</a></p>
-    </div>
-    
-    <div class="endpoint">
-        <p><span class="method">GET</span> <code>/visualpasses/{satelliteId}?lat={observer_lat}&lng={observer_lng}&alt={observer_alt}&days={days}&min_vis={min_visibility}</code></p>
-        <p>Get visual passes of a satellite</p>
-        <p>Example: <a href="/visualpasses/25544?lat=40.7128&lng=-74.0060&alt=0&days=10&min_vis=300">/visualpasses/25544?lat=40.7128&lng=-74.0060&alt=0&days=10&min_vis=300</a></p>
-    </div>
-    
-    <div class="endpoint">
-        <p><span class="method">GET</span> <code>/radiopasses/{satelliteId}?lat={observer_lat}&lng={observer_lng}&alt={observer_alt}&days={days}&min_el={min_elevation}</code></p>
-        <p>Get radio passes of a satellite</p>
-        <p>Example: <a href="/radiopasses/25544?lat=40.7128&lng=-74.0060&alt=0&days=10&min_el=0">/radiopasses/25544?lat=40.7128&lng=-74.0060&alt=0&days=10&min_el=0</a></p>
-    </div>
-    
-    <div class="endpoint">
-        <p><span class="method">GET</span> <code>/above?lat={observer_lat}&lng={observer_lng}&alt={observer_alt}&cat={category}&radius={search_radius}</code></p>
-        <p>Get satellites above a location</p>
-        <p>Example: <a href="/above?lat=40.7128&lng=-74.0060&alt=0&cat=18&radius=70">/above?lat=40.7128&lng=-74.0060&alt=0&cat=18&radius=70</a> (Amateur radio satellites)</p>
-    </div>
-</body>
-</html>`
-	w.Write([]byte(html))
+	http.ServeFile(w, r, "static/index.html")
 }
 
 func handleTLE(w http.ResponseWriter, r *http.Request) {
