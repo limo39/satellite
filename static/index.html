@@ -421,39 +421,14 @@
         function createEarth() {
             const geometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
 
-            // Earth texture with gradient
-            const canvas = document.createElement('canvas');
-            canvas.width = 2048;
-            canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
-
-            // Create gradient for ocean
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#1e3a8a');
-            gradient.addColorStop(0.5, '#2563eb');
-            gradient.addColorStop(1, '#1e3a8a');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Add continents (simplified)
-            ctx.fillStyle = '#15803d';
-            // North America
-            ctx.fillRect(200, 200, 400, 300);
-            // South America
-            ctx.fillRect(400, 500, 200, 300);
-            // Europe/Africa
-            ctx.fillRect(900, 200, 300, 400);
-            // Asia
-            ctx.fillRect(1200, 150, 500, 400);
-            // Australia
-            ctx.fillRect(1500, 600, 200, 150);
-
-            const texture = new THREE.CanvasTexture(canvas);
+            const textureLoader = new THREE.TextureLoader();
+            // Using a high-quality Earth texture from Three.js examples
+            const texture = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg');
 
             const material = new THREE.MeshPhongMaterial({
                 map: texture,
-                shininess: 20,
-                specular: 0x333333
+                shininess: 15,
+                specular: 0x222222
             });
 
             earth = new THREE.Mesh(geometry, material);
