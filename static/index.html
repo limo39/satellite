@@ -51,6 +51,7 @@
             font-size: 2.5em;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 5px;
         }
@@ -273,6 +274,261 @@
             background: rgba(139, 92, 246, 0.4);
             transform: scale(1.05);
         }
+
+        /* Mobile Toggle Button */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 0.9em;
+            }
+
+            header {
+                padding: 15px;
+            }
+
+            .mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .control-panel {
+                position: fixed;
+                top: auto;
+                bottom: -100%;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-height: 70vh;
+                border-radius: 20px 20px 0 0;
+                padding: 20px 15px 15px;
+                overflow-y: auto;
+                transition: bottom 0.3s ease;
+            }
+
+            .control-panel.mobile-open {
+                bottom: 0;
+            }
+
+            /* Add a drag handle at the top of control panel */
+            .control-panel::before {
+                content: '';
+                position: absolute;
+                top: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 4px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 2px;
+            }
+
+            .info-panel {
+                position: fixed;
+                bottom: auto;
+                top: 90px;
+                left: 10px;
+                right: 10px;
+                max-width: none;
+                padding: 12px 15px;
+                font-size: 0.95em;
+            }
+
+            .section h3 {
+                font-size: 1em;
+            }
+
+            .satellite-list {
+                max-height: 200px;
+            }
+
+            .popular-sats {
+                gap: 6px;
+            }
+
+            .sat-chip {
+                font-size: 0.75em;
+                padding: 6px 12px;
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            input,
+            select,
+            button {
+                font-size: 0.9em;
+                min-height: 44px;
+                /* Better touch targets */
+            }
+
+            button {
+                padding: 12px 20px;
+            }
+
+            .satellite-item {
+                min-height: 60px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .subtitle {
+                font-size: 0.85em;
+            }
+
+            header {
+                padding: 10px 15px;
+            }
+
+            .control-panel {
+                max-height: 75vh;
+                padding: 20px 12px 12px;
+            }
+
+            .info-panel {
+                top: 80px;
+                left: 8px;
+                right: 8px;
+                padding: 10px 12px;
+                font-size: 0.9em;
+            }
+
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+                padding: 6px 0;
+            }
+
+            .section {
+                margin-bottom: 15px;
+            }
+
+            .section h3 {
+                font-size: 0.95em;
+            }
+
+            .satellite-list {
+                max-height: 180px;
+            }
+
+            .satellite-item {
+                padding: 10px;
+                min-height: 56px;
+            }
+
+            input,
+            select {
+                padding: 10px 12px;
+                font-size: 0.85em;
+            }
+
+            button {
+                padding: 11px 18px;
+                font-size: 0.85em;
+            }
+
+            .sat-chip {
+                font-size: 0.7em;
+                padding: 5px 10px;
+                min-height: 30px;
+            }
+
+            .mobile-toggle {
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.3em;
+            }
+
+            .subtitle {
+                font-size: 0.8em;
+            }
+
+            .control-panel {
+                max-height: 80vh;
+            }
+
+            .info-panel {
+                top: 75px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .control-panel {
+                max-height: 85vh;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            header {
+                padding: 10px 15px;
+            }
+
+            .info-panel {
+                top: 70px;
+                left: 10px;
+                max-width: 280px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* Tablet optimization */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .control-panel {
+                width: 360px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+        }
     </style>
 </head>
 
@@ -334,6 +590,11 @@
             <h3 style="color: #818cf8; margin-bottom: 10px; font-size: 1em;">Selected Satellite</h3>
             <div id="sat-details"></div>
         </div>
+
+        <!-- Mobile Toggle Button -->
+        <button class="mobile-toggle" id="mobile-toggle" onclick="toggleMobilePanel()">
+            ☰
+        </button>
     </div>
 
     <script>
@@ -385,6 +646,10 @@
             let isDragging = false;
             let previousMousePosition = { x: 0, y: 0 };
 
+            // Touch controls variables
+            let previousTouchPosition = { x: 0, y: 0 };
+            let previousTouchDistance = 0;
+
             renderer.domElement.addEventListener('mousedown', (e) => {
                 isDragging = true;
                 previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -394,17 +659,7 @@
                 if (isDragging) {
                     const deltaX = e.clientX - previousMousePosition.x;
                     const deltaY = e.clientY - previousMousePosition.y;
-
-                    // Rotate around Z axis (spin) for flat earth
-                    earth.rotation.z += deltaX * 0.005;
-
-                    // Tilt around X axis (but limit it to keep it mostly flat-ish or viewable)
-                    // Initial X is -Math.PI / 2
-                    earth.rotation.x += deltaY * 0.005;
-
-                    // Clamp tilt to avoid flipping over completely
-                    earth.rotation.x = Math.max(-Math.PI / 2 - 1, Math.min(-Math.PI / 2 + 1, earth.rotation.x));
-
+                    handleRotation(deltaX, deltaY);
                     previousMousePosition = { x: e.clientX, y: e.clientY };
                 }
             });
@@ -412,6 +667,56 @@
             renderer.domElement.addEventListener('mouseup', () => {
                 isDragging = false;
             });
+
+            // Touch events
+            renderer.domElement.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    previousTouchPosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                } else if (e.touches.length === 2) {
+                    isDragging = false;
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    previousTouchDistance = Math.sqrt(dx * dx + dy * dy);
+                }
+            }, { passive: false });
+
+            renderer.domElement.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Prevent scrolling while interacting with canvas
+                if (e.touches.length === 1 && isDragging) {
+                    const deltaX = e.touches[0].clientX - previousTouchPosition.x;
+                    const deltaY = e.touches[0].clientY - previousTouchPosition.y;
+                    handleRotation(deltaX, deltaY);
+                    previousTouchPosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                } else if (e.touches.length === 2) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    const deltaDistance = distance - previousTouchDistance;
+                    // Zoom logic
+                    camera.position.y -= deltaDistance * 0.05;
+                    camera.position.y = Math.max(2, Math.min(50, camera.position.y));
+                    camera.lookAt(0, 0, 0);
+
+                    previousTouchDistance = distance;
+                }
+            }, { passive: false });
+
+            renderer.domElement.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+
+            function handleRotation(deltaX, deltaY) {
+                // Rotate around Z axis (spin) for flat earth
+                earth.rotation.z += deltaX * 0.005;
+
+                // Tilt around X axis
+                earth.rotation.x += deltaY * 0.005;
+
+                // Clamp tilt to avoid flipping over completely
+                earth.rotation.x = Math.max(-Math.PI / 2 - 1, Math.min(-Math.PI / 2 + 1, earth.rotation.x));
+            }
 
             // Zoom with mouse wheel
             renderer.domElement.addEventListener('wheel', (e) => {
@@ -557,10 +862,13 @@
                 if (satellites[id].label) earth.remove(satellites[id].label);
             }
 
-            // Create satellite mesh
-            const geometry = new THREE.SphereGeometry(0.15, 16, 16);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const satellite = new THREE.Mesh(geometry, material);
+            // Create satellite sprite
+            const map = new THREE.TextureLoader().load('jet.png');
+            const material = new THREE.SpriteMaterial({ map: map });
+            const satellite = new THREE.Sprite(material);
+
+            // Scale the sprite (adjust size as needed)
+            satellite.scale.set(0.5, 0.5, 1);
 
             const satPosition = latLngToVector3(position.satlatitude, position.satlongitude, position.sataltitude);
             satellite.position.copy(satPosition);
