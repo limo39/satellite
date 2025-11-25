@@ -27,6 +27,21 @@ func main() {
 
 	n2yoClient = client.NewClient(apiKey)
 
+	// Serve static files (CSS, JS, images, etc.) with correct MIME types
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Also serve files from root for backward compatibility
+	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/styles.css")
+	})
+	http.HandleFunc("/scripts.js", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/scripts.js")
+	})
+	http.HandleFunc("/jet.png", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/jet.png")
+	})
+
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/tle/", handleTLE)
 	http.HandleFunc("/positions/", handlePositions)
