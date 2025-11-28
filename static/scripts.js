@@ -263,12 +263,12 @@ function addSatelliteToScene(id, name, position) {
     }
 
     // Create satellite sprite
-    const map = new THREE.TextureLoader().load('/static/jet.png');
+    const map = new THREE.TextureLoader().load('/static/jet.svg');
     const material = new THREE.SpriteMaterial({ map: map });
     const satellite = new THREE.Sprite(material);
 
     // Scale the sprite (adjust size as needed)
-    satellite.scale.set(0.5, 0.5, 1);
+    satellite.scale.set(1.5, 1.5, 1);
 
     const satPosition = latLngToVector3(position.satlatitude, position.satlongitude, position.sataltitude);
     satellite.position.copy(satPosition);

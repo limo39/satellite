@@ -38,8 +38,8 @@ func main() {
 	http.HandleFunc("/scripts.js", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/scripts.js")
 	})
-	http.HandleFunc("/jet.png", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/jet.png")
+	http.HandleFunc("/jet.svg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/jet.svg")
 	})
 
 	http.HandleFunc("/", handleIndex)

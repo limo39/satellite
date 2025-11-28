@@ -1,0 +1,59 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  
+  <!-- Jet body -->
+  <path d="M 100 20 L 120 80 L 100 90 L 80 80 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+  
+  <!-- Cockpit -->
+  <circle cx="100" cy="35" r="6" fill="#fca5a5" stroke="#7f1d1d" stroke-width="1"/>
+  
+  <!-- Main fuselage -->
+  <rect x="95" y="90" width="10" height="70" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+  
+  <!-- Left wing (rotating) -->
+  <g>
+    <path d="M 95 100 L 40 110 L 45 115 L 100 105 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+    <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 100 105" to="360 100 105" dur="1.5s" repeatCount="indefinite"/>
+  </g>
+  
+  <!-- Right wing (rotating) -->
+  <g>
+    <path d="M 105 100 L 160 110 L 155 115 L 100 105 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+    <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 100 105" to="360 100 105" dur="1.5s" repeatCount="indefinite"/>
+  </g>
+  
+  <!-- Left engine with rotating propeller -->
+  <g>
+    <rect x="85" y="155" width="6" height="25" fill="#374151" stroke="#0c2340" stroke-width="1"/>
+    <g transform-origin="88 160">
+      <g>
+        <circle cx="88" cy="160" r="8" fill="none" stroke="#fca5a5" stroke-width="1.5" opacity="0.3"/>
+        <rect x="86" y="152" width="4" height="16" fill="#1f2937" stroke="#0c2340" stroke-width="0.5" rx="2"/>
+        <rect x="80" y="158" width="16" height="4" fill="#1f2937" stroke="#0c2340" stroke-width="0.5" rx="2"/>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 88 160" to="360 88 160" dur="0.6s" repeatCount="indefinite"/>
+      </g>
+    </g>
+    <path d="M 85 180 L 82 190 L 88 190 L 91 180 Z" fill="#ef4444" opacity="0.7"/>
+  </g>
+  
+  <!-- Right engine with rotating propeller -->
+  <g>
+    <rect x="109" y="155" width="6" height="25" fill="#374151" stroke="#0c2340" stroke-width="1"/>
+    <g transform-origin="112 160">
+      <g>
+        <circle cx="112" cy="160" r="8" fill="none" stroke="#fca5a5" stroke-width="1.5" opacity="0.3"/>
+        <rect x="110" y="152" width="4" height="16" fill="#1f2937" stroke="#0c2340" stroke-width="0.5" rx="2"/>
+        <rect x="104" y="158" width="16" height="4" fill="#1f2937" stroke="#0c2340" stroke-width="0.5" rx="2"/>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 112 160" to="360 112 160" dur="0.6s" repeatCount="indefinite"/>
+      </g>
+    </g>
+    <path d="M 109 180 L 106 190 L 112 190 L 115 180 Z" fill="#ef4444" opacity="0.7"/>
+  </g>
+  
+  <!-- Tail fin -->
+  <path d="M 100 160 L 95 175 L 100 170 L 105 175 Z" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5"/>
+  
+  <!-- Speed lines for motion effect -->
+  <line x1="30" y1="95" x2="50" y2="95" stroke="#fca5a5" stroke-width="2" opacity="0.6"/>
+  <line x1="25" y1="105" x2="40" y2="105" stroke="#fca5a5" stroke-width="2" opacity="0.4"/>
+  <line x1="35" y1="115" x2="50" y2="115" stroke="#fca5a5" stroke-width="2" opacity="0.5"/>
+</svg>
