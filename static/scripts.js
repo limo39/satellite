@@ -2,6 +2,9 @@
 let scene, camera, renderer, earth, stars, satellites = {};
 let observerMarker = null;
 let selectedSatellite = null;
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let hoveredSatellite = null;
 
 const API_BASE = window.location.origin;
 const EARTH_RADIUS = 5;
@@ -62,6 +65,16 @@ function init() {
             handleRotation(deltaX, deltaY);
             previousMousePosition = { x: e.clientX, y: e.clientY };
         }
+    });
+
+    renderer.domElement.addEventListener('click', (e) => {
+        // Update mouse position for raycasting
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        // Check for satellite click
+        checkSatelliteClick();
     });
 
     renderer.domElement.addEventListener('mouseup', () => {
@@ -309,8 +322,22 @@ function updateSatelliteList() {
         item.innerHTML = `
             <div class="sat-name">${sat.name}</div>
             <div class="sat-id">ID: ${sat.id}</div>
-            <div class="sat-info">Alt: ${sat.position.sataltitude.toFixed(0)} km</div>
+            <div class="sat-info">Lat: ${sat.position.satlatitude.toFixed(2)}° | Lng: ${sat.position.satlongitude.toFixed(2)}° | Alt: ${sat.position.sataltitude.toFixed(0)} km</div>
         `;
+
+        // Add hover effect to scale up satellite on map
+        item.addEventListener('mouseenter', () => {
+            if (sat.mesh) {
+                sat.mesh.scale.set(2.2, 2.2, 1);
+            }
+        });
+
+        item.addEventListener('mouseleave', () => {
+            if (sat.mesh) {
+                sat.mesh.scale.set(1.5, 1.5, 1);
+            }
+        });
+
         listEl.appendChild(item);
     });
 }
@@ -346,6 +373,27 @@ function selectSatellite(id) {
         `;
     }
 }
+
+function checkSatelliteClick() {
+    raycaster.setFromCamera(mouse, camera);
+
+    const satelliteMeshes = Object.values(satellites).map(sat => sat.mesh);
+    const intersects = raycaster.intersectObjects(satelliteMeshes);
+
+    if (intersects.length > 0) {
+        const intersectedMesh = intersects[0].object;
+
+        // Find the satellite by mesh
+        for (const [id, sat] of Object.entries(satellites)) {
+            if (sat.mesh === intersectedMesh) {
+                selectSatellite(sat.id);
+                break;
+            }
+        }
+    }
+}
+
+
 
 function animate() {
     requestAnimationFrame(animate);
